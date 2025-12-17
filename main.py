@@ -2,7 +2,7 @@ from pathlib import Path
 
 from src.data_loader import build_dataset
 from src.models import split_data, train_logistic_regression, train_random_forest
-from src.evaluation import run_classification_evaluation, save_metrics_summary
+from src.evaluation import run_classification_evaluation, save_metrics_summary, save_feature_importance_png
 
 
 
@@ -41,6 +41,18 @@ def main() -> None:
         run_name="baseline",
     )
     print("Random Forest metrics:", rf_metrics)
+
+    out_dir = Path("results")
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    save_feature_importance_png(
+    model=rf_model,
+    feature_names=list(X_train.columns),
+    out_path=out_dir / "baseline_random_forest_feature_importance.png",
+    top_n=20,
+    title="Top 20 Feature Importances — Random Forest",
+    )
+    print("Saved feature importance plot to results/baseline_random_forest_feature_importance.png")
 
     summary_path = save_metrics_summary(
     metrics_list=[lr_metrics, rf_metrics],

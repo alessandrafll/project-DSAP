@@ -128,3 +128,33 @@ def save_confusion_matrix_png(
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
+
+def save_feature_importance_png(
+    model,
+    feature_names: list[str],
+    out_path: Path,
+    top_n: int = 20,
+    title: str = "Feature Importance (Random Forest)",
+) -> None:
+    """
+    Save a PNG graph with importance of features from a Random Forest model.
+    """
+    if not hasattr(model, "feature_importances_"):
+        raise ValueError("Model has no attribute 'feature_importances_'")
+
+    importances = model.feature_importances_
+    df = pd.DataFrame({"feature": feature_names, "importance": importances})
+    df = df.sort_values("importance", ascending=False).head(top_n)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    # the most important feature on top
+    ax.barh(df["feature"][::-1], df["importance"][::-1])
+    ax.set_title(title)
+    ax.set_xlabel("Importance")
+    ax.set_ylabel("Feature")
+
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
