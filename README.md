@@ -49,6 +49,22 @@ The aim is to test whether basic firm characteristics (e.g., market cap, P/E rat
 
 ---
 
+## Data
+
+This project uses the **S&P 500 ESG Risk Ratings** dataset from Kaggle.
+
+- Dataset: https://www.kaggle.com/datasets/pritish509/s-and-p-500-esg-risk-ratings
+- Source: Kaggle (originally based on Sustainalytics ESG data)
+
+### How to obtain the data
+
+1. Download the dataset from Kaggle:
+   https://www.kaggle.com/datasets/pritish509/s-and-p-500-esg-risk-ratings
+2. Extract the CSV file.
+3. Place the file in the following directory
+
+
+
 ## Author
 **Alessandra Failla**  
 University of Lausanne, 2025
