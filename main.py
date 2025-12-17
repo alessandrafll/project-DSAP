@@ -2,7 +2,7 @@ from pathlib import Path
 
 from src.data_loader import build_dataset
 from src.models import split_data, train_logistic_regression, train_random_forest
-from src.evaluation import run_classification_evaluation
+from src.evaluation import run_classification_evaluation, save_metrics_summary
 
 
 
@@ -41,6 +41,13 @@ def main() -> None:
         run_name="baseline",
     )
     print("Random Forest metrics:", rf_metrics)
+
+    summary_path = save_metrics_summary(
+    metrics_list=[lr_metrics, rf_metrics],
+    results_dir="results",
+    run_name="baseline",
+    )
+    print(f" Saved metrics summary to: {summary_path}")
 
 
 if __name__ == "__main__":

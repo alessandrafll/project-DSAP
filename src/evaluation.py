@@ -73,3 +73,24 @@ def run_classification_evaluation(
 
 
     return payload
+
+def save_metrics_summary(
+    metrics_list: list[dict],
+    results_dir: str = "results",
+    run_name: str = "run",
+) -> Path:
+    """
+    Transform a metrics dictionnary list into a table (CSV)
+    """
+    out_dir = ensure_results_dir(results_dir)
+    df = pd.DataFrame(metrics_list)
+
+    # order of columns
+    preferred = ["run_name", "model", "task_type", "accuracy", "precision", "recall", "f1"]
+    cols = [c for c in preferred if c in df.columns] + [c for c in df.columns if c not in preferred]
+    df = df[cols]
+
+    out_path = out_dir / f"{run_name}_metrics_summary.csv"
+    df.to_csv(out_path, index=False)
+    return out_path
+
