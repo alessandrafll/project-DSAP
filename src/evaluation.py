@@ -71,6 +71,13 @@ def run_classification_evaluation(
 
     save_json(payload, out_dir / f"{prefix}_metrics.json")
 
+        # Save confusion matrix figure
+    save_confusion_matrix_png(
+        y_true=y_true,
+        y_pred=y_pred,
+        out_path=out_dir / f"{prefix}_confusion_matrix.png",
+        title=f"Confusion Matrix — {model_name}",
+    )
 
     return payload
 
@@ -94,3 +101,30 @@ def save_metrics_summary(
     df.to_csv(out_path, index=False)
     return out_path
 
+def save_confusion_matrix_png(
+    y_true,
+    y_pred,
+    out_path: Path,
+    title: str = "Confusion Matrix",
+) -> None:
+    """
+    Save a confusion matrix into a PNG iamge.
+    """
+    cm = confusion_matrix(y_true, y_pred)
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    im = ax.imshow(cm)
+
+    ax.set_title(title)
+    ax.set_xlabel("Predicted")
+    ax.set_ylabel("True")
+
+    # write values into each cell
+    for (i, j), v in np.ndenumerate(cm):
+        ax.text(j, i, str(v), ha="center", va="center")
+
+    fig.colorbar(im)
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=200)
+    plt.close(fig)
