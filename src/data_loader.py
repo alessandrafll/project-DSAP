@@ -124,16 +124,41 @@ def _fetch_yf_info(ticker: str) -> dict:
 
 
 
+def _processed_dir(base_data_dir: Path) -> Path:
+    out = base_data_dir / PROCESSED_DIR_NAME
+    out.mkdir(parents=True, exist_ok=True)
+    return out
+
+
 def build_dataset(
     data_dir: Path,
-    use_cache: bool = True,
-    refresh_cache: bool = False,
+    
 ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     - load and clean ESG data from data/raw/
+    - get Yahoo Finance indicators 
+    - merge
+    - return X (features), y (target), df_merged
     """
     raw_dir = data_dir / "raw"
 
     # 1) ESG
     df_esg_raw = load_esg_raw(raw_dir)
     df_esg_clean = clean_esg(df_esg_raw)
+
+    # 2) Merge ESG + finance
+    df_merged = df_esg_clean.merge(df_yf, on="Ticker", how="inner")
+
+    # 3) Imputation of missing values
+    df_merged[NUM_COLS] = df_merged[NUM_COLS].apply(lambda col: col.fillna(col.median()))
+    df_merged[CAT_COLS] = df_merged[CAT_COLS].fillna("Unknown")
+
+    # 4) One-hot encoding
+    X_num = df_merged[NUM_COLS]
+    X_cat = pd.get_dummies(df_merged[CAT_COLS], drop_first=True)
+    X = pd.concat([X_num, X_cat], axis=1)
+
+    # 5) Target
+    y = df_merged[TARGET_COL]
+
+    return X, y, df_merged
