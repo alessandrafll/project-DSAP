@@ -71,7 +71,7 @@ def run_classification_evaluation(
 
     save_json(payload, out_dir / f"{prefix}_metrics.json")
 
-        # Save confusion matrix figure
+    # Save confusion matrix figure
     save_confusion_matrix_png(
         y_true=y_true,
         y_pred=y_pred,

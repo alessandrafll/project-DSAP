@@ -1,4 +1,5 @@
 from pathlib import Path
+import matplotlib.pyplot as plt
 
 from src.data_loader import build_dataset
 from src.models import split_data, train_logistic_regression, train_random_forest
@@ -10,6 +11,31 @@ def main() -> None:
     # 1) Path to data/raw and construction of metrics
     data_dir = Path("data")
     X, y, _df_merged = build_dataset(data_dir, use_cache=True, refresh_cache=False)
+
+    # 2) Analysis of ESG Risk Score by Sector
+    sector_summary = (
+    _df_merged
+    .groupby("Sector")["ESG_Risk_Score"]
+    .mean()
+    .sort_values(ascending=False)
+    )
+    
+    results_dir = Path("results")
+    results_dir.mkdir(parents=True, exist_ok=True)
+
+    sector_summary.to_csv(results_dir / "sector_esg_risk_summary.csv")
+    print("Saved sector summary to results/sector_esg_risk_summary.csv")
+
+    plt.figure(figsize=(10, 6))
+    sector_summary.plot(kind="bar")
+    plt.ylabel("Average ESG Risk Score")
+    plt.title("Average ESG Risk Score by Sector")
+    plt.tight_layout()
+
+    plt.savefig(results_dir / "sector_esg_risk_comparison.png", dpi=200)
+    plt.close()
+
+    print("Saved plot to results/sector_esg_risk_comparison.png")
 
 
     # 3) Split train / test
