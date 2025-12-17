@@ -123,6 +123,16 @@ def _fetch_yf_info(ticker: str) -> dict:
     }
 
 
+def load_yf_data(tickers: list[str]) -> pd.DataFrame:
+    """
+    Apply _fetch_yf_info to a list of tickers and return a DataFrame
+    """
+    rows: list[dict] = []
+    for t in tickers:
+        rows.append(_fetch_yf_info(t))
+    df_yf = pd.DataFrame(rows)
+    return df_yf
+
 
 def _processed_dir(base_data_dir: Path) -> Path:
     out = base_data_dir / PROCESSED_DIR_NAME
@@ -130,13 +140,27 @@ def _processed_dir(base_data_dir: Path) -> Path:
     return out
 
 
+def load_yf_cache(base_data_dir: Path) -> pd.DataFrame:
+    cache_path = _processed_dir(base_data_dir) / YF_CACHE_NAME
+    if not cache_path.exists():
+        raise FileNotFoundError(f"Yahoo Finance cache not found at {cache_path}")
+    return pd.read_csv(cache_path)
+
+
+def save_yf_cache(df_yf: pd.DataFrame, base_data_dir: Path) -> Path:
+    cache_path = _processed_dir(base_data_dir) / YF_CACHE_NAME
+    df_yf.to_csv(cache_path, index=False)
+    return cache_path
+
+
 def build_dataset(
     data_dir: Path,
-    
+    use_cache: bool = True,
+    refresh_cache: bool = False,
 ) -> Tuple[pd.DataFrame, pd.Series, pd.DataFrame]:
     """
     - load and clean ESG data from data/raw/
-    - get Yahoo Finance indicators 
+    - get Yahoo Finance indicators (from cache if available)
     - merge
     - return X (features), y (target), df_merged
     """
@@ -146,19 +170,33 @@ def build_dataset(
     df_esg_raw = load_esg_raw(raw_dir)
     df_esg_clean = clean_esg(df_esg_raw)
 
-    # 2) Merge ESG + finance
+    # 2) Yahoo Finance (cache first)
+    tickers = df_esg_clean["Ticker"].dropna().unique().tolist()
+
+    df_yf = None
+    if use_cache and not refresh_cache:
+        try:
+            df_yf = load_yf_cache(data_dir)
+        except FileNotFoundError:
+            df_yf = None
+
+    if df_yf is None:
+        df_yf = load_yf_data(tickers)
+        save_yf_cache(df_yf, data_dir)
+
+    # 3) Merge ESG + finance
     df_merged = df_esg_clean.merge(df_yf, on="Ticker", how="inner")
 
-    # 3) Imputation of missing values
+    # 4) Imputation of missing values
     df_merged[NUM_COLS] = df_merged[NUM_COLS].apply(lambda col: col.fillna(col.median()))
     df_merged[CAT_COLS] = df_merged[CAT_COLS].fillna("Unknown")
 
-    # 4) One-hot encoding
+    # 5) One-hot encoding
     X_num = df_merged[NUM_COLS]
     X_cat = pd.get_dummies(df_merged[CAT_COLS], drop_first=True)
     X = pd.concat([X_num, X_cat], axis=1)
 
-    # 5) Target
+    # 6) Target
     y = df_merged[TARGET_COL]
 
     return X, y, df_merged
