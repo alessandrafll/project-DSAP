@@ -1,7 +1,7 @@
 # ESG Risk Prediction Project
 
 This repository contains my **individual final project** for the course  
-**Advanced Programming : Data Science (Fall 2025)** at HEC Lausanne.
+**Advanced Programming: Data Science (Fall 2025)** at HEC Lausanne.
 
 The objective of this project is to analyze and predict **ESG Risk Levels** of S&P 500 companies using publicly available ESG data and financial indicators, and to compare the performance of two machine learning models.
 

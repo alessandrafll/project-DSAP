@@ -10,11 +10,15 @@ from src.evaluation import run_classification_evaluation, save_metrics_summary, 
 def main() -> None:
     # 1) Path to data/raw and construction of metrics
     data_dir = Path("data")
-    X, y, _df_merged = build_dataset(data_dir, use_cache=True, refresh_cache=False)
+    X, y, df_merged = build_dataset(data_dir, use_cache=True, refresh_cache=False)
+    print("Final merged dataset shape:", df_merged.shape)
+    print("Number of observations (rows):", df_merged.shape[0])
+    print("Number of variables (columns):", df_merged.shape[1])
+
 
     # 2) Analysis of ESG Risk Score by Sector
     sector_summary = (
-    _df_merged
+    df_merged
     .groupby("Sector")["ESG_Risk_Score"]
     .mean()
     .sort_values(ascending=False)

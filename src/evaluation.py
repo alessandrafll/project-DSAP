@@ -81,6 +81,7 @@ def run_classification_evaluation(
 
     return payload
 
+
 def save_metrics_summary(
     metrics_list: list[dict],
     results_dir: str = "results",
@@ -100,6 +101,7 @@ def save_metrics_summary(
     out_path = out_dir / f"{run_name}_metrics_summary.csv"
     df.to_csv(out_path, index=False)
     return out_path
+
 
 def save_confusion_matrix_png(
     y_true,
@@ -128,6 +130,7 @@ def save_confusion_matrix_png(
     fig.tight_layout()
     fig.savefig(out_path, dpi=200)
     plt.close(fig)
+
 
 def save_feature_importance_png(
     model,
