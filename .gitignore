@@ -1,6 +1,8 @@
 # Generated results
 results/
 data/processed/
+data/raw/
+
 
 # Virtual environments
 venv/
