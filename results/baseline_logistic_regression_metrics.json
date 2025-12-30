@@ -1,9 +1,0 @@
-{
-  "run_name": "baseline",
-  "model": "logistic_regression",
-  "task_type": "classification",
-  "accuracy": 0.6111111111111112,
-  "precision": 0.6780864197530863,
-  "recall": 0.6111111111111112,
-  "f1": 0.6362524796601876
-}

@@ -1,0 +1,12 @@
+# Generated results
+results/
+data/processed/
+
+# Virtual environments
+venv/
+venv_ta/
+
+# Python cache
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
